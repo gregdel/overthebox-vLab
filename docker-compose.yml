@@ -1,0 +1,37 @@
+version: '2'
+
+services:
+  modem1:
+    build: ./dnsmasq/.
+    container_name: modem1
+    volumes:
+      - ./dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf:ro
+    networks:
+      - modem1
+    cap_add:
+      - NET_ADMIN
+  otb:
+    build: ./overthebox/
+    container_name: otb
+    tmpfs:
+      - /var/run
+      - /var/lock
+    networks:
+      - modem1
+    depends_on:
+      - modem1
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    entrypoint: /sbin/init
+    hostname: overthebox
+
+networks:
+  modem1:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.30.0.0/24
+          gateway: 172.30.0.1

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMG_NAME="ovethebox"
+IMG_NAME="overthebox"
 BASE_URL="http://downloads.overthebox.ovh/stable/x86/64"
 IMG_URL="${BASE_URL}/openwrt-x86-64-rootfs.tar.gz"
 PACKAGES_FILE="${BASE_URL}/packages/overthebox/Packages"
