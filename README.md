@@ -10,19 +10,22 @@ This tool is made for development purposes only.
 
 ## Run
 
-The docker compose file will start two containers, one with the overthebox image and one with a dhcp server. They will both be on the same private network.
+The docker compose file will start three containers, one with the overthebox image and two with a dhcp server. They will all be on the same private network.
+You can bind a public IP on each modem using the ```add_wan.sh``` script.
 
-Just run docker compose to get everything started.
-
-```
-docker-compose up
-```
-
-Once the overthebox container is registered and associated with an overthebox service, the dhcp container can be stopped.
 
 ```
-docker-compose stop modem1
+docker-compose up -d otb
+docker-compose up -d modem1
 ```
+
+Wait for the OTB to get an IP on the first network. And then stop the DHCP server on the modem1.
+
+```
+docker exec modem1 supervisorctl stop dnsmasq
+```
+
+You can now do the same with modem2.
 
 ## Tips
 
