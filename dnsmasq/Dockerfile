@@ -1,6 +1,6 @@
 FROM alpine:3.4
 
-RUN apk update && apk add --no-cache dnsmasq supervisor iptables
+RUN apk update && apk add --no-cache dnsmasq supervisor iptables iproute2
 
 COPY run.sh /usr/bin/run.sh
 COPY dnsmasq.conf /etc/dnsmasq.conf
