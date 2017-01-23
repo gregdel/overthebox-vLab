@@ -1,0 +1,20 @@
+#! /bin/bash
+
+DOCKER_BRIDGE_ID=$(docker network ls | grep ovethebox_lan | awk '{ print $1 }')
+DOCKER_BRIDGE="br-${DOCKER_BRIDGE_ID}"
+
+FORWARD=$(cat /proc/sys/net/ipv4/ip_forward)
+if [ ${FORWARD} -ne 1 ]; then
+    sysctl -w net.ipv4.ip_forward=1
+fi
+
+if [ -n "$1" ];then
+        ip tuntap add $1 mode tap
+        ip link set $1 up
+        sleep 0.5s
+        ip link set $1 master ${DOCKER_BRIDGE}
+        exit 0
+else
+        echo "Error: no interface specified"
+        exit 1
+fi
