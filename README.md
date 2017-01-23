@@ -7,33 +7,25 @@ This tool is made for development purposes only.
 
 * docker (1.12.0+)
 * docker-compose (1.7.0+)
+* kvm (qemu-kvm libvirt-bin on debian)
 
 ## Run
 
-The docker compose file will start three containers, one with the overthebox image and two with a dhcp server. They will all be on the same private network.
-You can bind a public IP on each modem using the ```add_wan.sh``` script.
+### General idea
 
+* Docker will create a bridge network
+* Docker will create FAI boxes and clients on the same switch (bridge)
+* kvm will provide full virtualisation of the overthebox, it will be linked to the same switch
 
-```
-docker-compose up -d otb
-docker-compose up -d modem1
-```
+### Steps
 
-Wait for the OTB to get an IP on the first network. And then stop the DHCP server on the modem1.
-
-```
-docker exec modem1 supervisorctl stop dnsmasq
-```
-
-You can now do the same with modem2. To force the OTB to check for a new DHCP you can run this command:
-
-```
-docker exec otb pkill -USR1 udhcpc
-```
-
-## Tips
-
-There's also an helper script to download, tag and push the latest stable image to the docker hub.
+* Start modem1: ```docker-compose up -d modem1```
+* Setup the wan IP on modem1: ```docker-compose up -d modem1```
+* Start the kvm: ```kvm/setup.sh```
+* Once the otb has an IP, stop dnsmasq on modem1: ```docker exec modem1 supervisorctl stop dnsmasq```
+* Start modem2: ```docker-compose up -d modem2```
+* Setup the wan IP on modem2 ```sudo ./add_wan.sh```
+* Force the otb to scan for a new network: ```pkill -USR1 udhcpc```
 
 ## Register your device using the API
 
@@ -57,10 +49,10 @@ go run *.go --listServices
 ```
 
 
-Get the device_id from your docker:
+Get the device_id from kvm:
 
 ```
-docker exec otb uci show overthebox.me.device_id
+uci show overthebox.me.device_id
 ```
 
 Link the device with the service
@@ -69,8 +61,8 @@ Link the device with the service
 go run *.go -deviceId YOUR_DEVICE_ID -serviceId YOUR_SERVICE_ID
 ```
 
-Confirm the service on the device
+Confirm the service on the device (from v0.4.24), run this in the kvm
 
 ```
-./activate_device.sh
+overthebox_confirm_service
 ```

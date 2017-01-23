@@ -31,21 +31,6 @@ services:
         ipv4_address: 192.168.2.1
     cap_add:
       - NET_ADMIN
-  otb:
-    build: ./overthebox/
-    container_name: otb
-    tmpfs:
-      - /var/run
-      - /var/lock
-    networks:
-      lan:
-        ipv4_address: 192.168.1.100
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun
-    entrypoint: /sbin/init
-    hostname: overthebox
 
 networks:
   lan:
