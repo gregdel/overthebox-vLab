@@ -27,6 +27,22 @@ This tool is made for development purposes only.
 * Setup the wan IP on modem2 ```sudo ./add_wan.sh```
 * Force the otb to scan for a new network: ```pkill -USR1 udhcpc```
 
+### Setup dnat
+
+You can setup a dnat to access your OTB via ssh and https.
+
+```
+./setup_dnat.sh modem1 _ip_of_the_otb_in_the_modem1_net_ _your_public_ip_
+```
+
+### Setup tc - rate / latency
+
+You can setup the latency and the rate of each modem using the ```setup_tc.sh``` script.
+
+```
+./setup_tc.sh modem2 1mbit 200ms
+```
+
 ## Register your device using the API
 
 ### Create an app
