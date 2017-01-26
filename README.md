@@ -20,11 +20,11 @@ This tool is made for development purposes only.
 ### Steps
 
 * Start modem1: ```docker-compose up -d modem1```
-* Setup the wan IP on modem1: ```docker-compose up -d modem1```
-* Start the kvm: ```kvm/setup.sh```
+* Setup the wan IP on modem1: ```sudo ./add_wan.sh modem1 _failover_ip_1_```
+* Start the kvm: ```cd kvm && ./setup.sh```
 * Once the otb has an IP, stop dnsmasq on modem1: ```docker exec modem1 supervisorctl stop dnsmasq```
 * Start modem2: ```docker-compose up -d modem2```
-* Setup the wan IP on modem2 ```sudo ./add_wan.sh```
+* Setup the wan IP on modem2 ```sudo ./add_wan.sh modem2 _failover_ip_2_```
 * Force the otb to scan for a new network: ```pkill -USR1 udhcpc```
 
 ### Setup dnat
