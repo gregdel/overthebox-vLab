@@ -130,8 +130,7 @@ setup_wan_ip() {
     docker exec $modem ip link set wan up
     docker exec $modem ip addr add $wan_ip/32 dev wan
     docker exec $modem ip route add $host_gw dev wan
-    docker exec $modem ip route del default
-    docker exec $modem ip route add default via $host_gw
+    docker exec $modem ip route change default via $host_gw
     echo "[wan] Done"
 
     echo "[wan] Configuring iptables"
