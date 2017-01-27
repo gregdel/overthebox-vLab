@@ -21,7 +21,7 @@ start_network() {
         --driver bridge \
         --subnet 192.168.0.0/16 \
         --gateway 192.168.0.1 \
-        --internal vLab
+        $NETWORK_NAME
     echo "[network] Network created"
 }
 
@@ -34,7 +34,11 @@ cleanup() {
     done
     echo "[cleanup] Deleting network"
         docker network rm $NETWORK_NAME
-    echo "[clanup] Done"
+    echo "[cleanup] Done"
+
+    echo "[cleanup] Deleting docker images"
+        docker rmi modem
+    echo "[cleanup] Done"
 }
 
 # Creates a container with the index $1
@@ -52,7 +56,7 @@ start_container() {
     # Start the docker container
     docker run \
         --detach \
-        --network vLab \
+        --network $NETWORK_NAME \
         --ip "192.168.${1}.1" \
         --cap-add NET_ADMIN \
         --name $modem_name \
@@ -72,7 +76,7 @@ start_temporary_client() {
     docker run \
         -it \
         --rm \
-        --network vLab \
+        --network $NETWORK_NAME \
         --cap-add NET_ADMIN \
         alpine sh
 }
