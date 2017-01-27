@@ -1,6 +1,6 @@
 #! /bin/bash
 
-DOCKER_BRIDGE_ID=$(docker network ls | grep ovethebox_lan | awk '{ print $1 }')
+DOCKER_BRIDGE_ID=$(docker network ls | grep vLab | awk '{ print $1 }')
 DOCKER_BRIDGE="br-${DOCKER_BRIDGE_ID}"
 
 FORWARD=$(cat /proc/sys/net/ipv4/ip_forward)

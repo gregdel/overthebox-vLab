@@ -19,12 +19,12 @@ This tool is made for development purposes only.
 
 ### Steps
 
-* Start modem1: ```docker-compose up -d modem1```
-* Setup the wan IP on modem1: ```sudo ./add_wan.sh modem1 _failover_ip_1_```
+* Start modem1: ```sudo ./lab.sh --modem 1```
+* Setup the wan IP on modem1: ```sudo ./lab.sh --wan modem1 _failover_ip_1_```
 * Start the kvm: ```cd kvm && ./setup.sh```
 * Once the otb has an IP, stop dnsmasq on modem1: ```docker exec modem1 supervisorctl stop dnsmasq```
-* Start modem2: ```docker-compose up -d modem2```
-* Setup the wan IP on modem2 ```sudo ./add_wan.sh modem2 _failover_ip_2_```
+* Start modem2: ```sudo ./lab.sh --modem 2```
+* Setup the wan IP on modem2 ```sudo ./lab.sh --wan modem2 _failover_ip_2_```
 * Force the otb to scan for a new network: ```pkill -USR1 udhcpc```
 
 ### Setup dnat
@@ -32,7 +32,7 @@ This tool is made for development purposes only.
 You can setup a dnat to access your OTB via ssh and https.
 
 ```
-./setup_dnat.sh modem1 _ip_of_the_otb_in_the_modem1_net_ _your_public_ip_
+sudo ./lab.sh --dnat modem1 _local_ip_ _remote_ip_
 ```
 
 ### Setup tc - rate / latency
