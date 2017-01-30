@@ -99,6 +99,22 @@ setup_dnat() {
     echo "[dnat] https://${public_wan}"
 }
 
+modem_traffic_switch() {
+    local modem=$1
+    local next_state=$2
+    case $next_state in
+        on)
+            docker exec $modem iptables -t filter -P FORWARD ACCEPT
+            echo "modem traffic allowed";;
+        off)
+            docker exec $modem iptables -t filter -P FORWARD DROP
+            echo "modem traffic blocked";;
+        *)
+            echo "Only on/off values are allowed";
+            exit 1;
+    esac
+}
+
 setup_wan_ip() {
     local modem=$1
     local wan_ip=$2
@@ -145,6 +161,7 @@ usage() {
     echo -e "    --cleanup|-d                                  Cleanup the lab"
     echo -e "    --dnat|-r <modem> <local_ip> <authorized_ip>  Setup dnat"
     echo -e "    --wan|-w <modem> <wan_ip>                     Add a public IP on the wan interface of a modem"
+    echo -e "    --traffic|-t <modem> on|off                   Enable or disable the traffic on a modem"
 }
 
 if [ "$#" -lt 1 ]; then
@@ -160,6 +177,12 @@ while [ "$1" != "" ]; do
                                 start_container $1
                                 ;;
         -d | --cleanup )        cleanup
+                                exit
+                                ;;
+        -t | --traffic )        shift
+                                modem=$1
+                                shift
+                                modem_traffic_switch $modem $1
                                 exit
                                 ;;
         -r | --dnat )           shift
