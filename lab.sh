@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 NETWORK_NAME=vLab
 
@@ -11,7 +11,7 @@ build_image() {
 
 # Creates the lab network
 start_network() {
-    if docker network inspect $NETWORK_NAME 2&>1 > /dev/null; then
+    if docker network inspect $NETWORK_NAME &> /dev/null; then
         echo "[network] The lab network $NETWORK_NAME is already created"
         return 0
     fi
@@ -46,7 +46,7 @@ start_container() {
     local modem_name="modem${1}"
 
     # Only start the container if it does not exists
-    DOCKER_ID=$(docker inspect --format '{{ .Id }}' $modem_name)
+    DOCKER_ID=$(docker inspect --format '{{ .Id }}' $modem_name 2> /dev/null)
     if [ -n "$DOCKER_ID" ]; then
         echo "[container $1] $modem_name already started with ID $DOCKER_ID"
         return 0
