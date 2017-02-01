@@ -1,4 +1,4 @@
-# Docker overthebox
+# OverTheBox virtual lab
 
 This tool is made for development purposes only.
 
@@ -6,7 +6,6 @@ This tool is made for development purposes only.
 ## Requirements
 
 * docker (1.12.0+)
-* docker-compose (1.7.0+)
 * kvm (qemu-kvm libvirt-bin on debian)
 
 ## Run
