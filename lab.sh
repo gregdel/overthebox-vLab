@@ -166,6 +166,11 @@ usage() {
     echo -e "    --traffic|-t <modem> on|off                   Enable or disable the traffic on a modem"
 }
 
+if [ "$(id -u)" -ne 0 ]; then
+    echo "This program must be run as root"
+    exit 1
+fi
+
 if [ "$#" -lt 1 ]; then
     usage
     exit 1
