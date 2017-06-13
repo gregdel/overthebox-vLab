@@ -2,6 +2,10 @@
 
 NETWORK_NAME=vLab
 
+: "${LAB_NETWORK_PREFIX:=192.168}"
+SUBNET="${LAB_NETWORK_PREFIX}.0.0/16"
+GATEWAY="${LAB_NETWORK_PREFIX}.0.1"
+
 # Creates the modem docker image
 build_image() {
     echo "[image] Building..."
@@ -19,9 +23,9 @@ start_network() {
     echo "[network] Creating the lab network with the name: $NETWORK_NAME"
     docker network create \
         --driver bridge \
-        --subnet 192.168.0.0/16 \
-        --gateway 192.168.0.1 \
-        $NETWORK_NAME
+        --subnet "$SUBNET" \
+        --gateway "$GATEWAY" \
+        "$NETWORK_NAME"
     echo "[network] Network created"
 }
 
@@ -57,16 +61,16 @@ start_container() {
     docker run \
         --detach \
         --network $NETWORK_NAME \
-        --ip "192.168.${1}.1" \
+        --ip "${LAB_NETWORK_PREFIX}.${1}.1" \
         --cap-add NET_ADMIN \
         --name "$modem_name" \
         --hostname "$modem_name" \
         --restart always \
         --env LAN_IFACE=eth0 \
         --env DNS_SERVER="8.8.8.8" \
-        --env LAN_IP="192.168.${1}.1" \
-        --env LAN_RANGE_MIN="192.168.${1}.50" \
-        --env LAN_RANGE_MAX="192.168.${1}.100" \
+        --env LAN_IP="${LAB_NETWORK_PREFIX}.${1}.1" \
+        --env LAN_RANGE_MIN="${LAB_NETWORK_PREFIX}.${1}.50" \
+        --env LAN_RANGE_MAX="${LAB_NETWORK_PREFIX}.${1}.100" \
         modem
     echo "[container $1] $modem_name started"
 }
@@ -152,7 +156,7 @@ setup_wan_ip() {
     echo "[wan] Done"
 
     echo "[wan] Configuring iptables"
-    docker exec "$modem" iptables -t nat -A POSTROUTING -s 192.168.0.0/16 -o wan -j MASQUERADE
+    docker exec "$modem" iptables -t nat -A POSTROUTING -s "$SUBNET" -o wan -j MASQUERADE
     echo "[wan] Done"
 }
 
