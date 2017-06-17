@@ -18,6 +18,15 @@ This tool is made for development purposes only.
 
 ### Steps
 
+Note: you can use a custom prefix for your network:
+
+```
+sudo LAB_NETWORK_PREFIX=10.0 ./lab.sh
+```
+
+To get the 10.0.0.0/16 network
+
+
 * Start modem1: ```sudo ./lab.sh --modem 1```
 * Setup the wan IP on modem1: ```sudo ./lab.sh --wan modem1 _failover_ip_1_```
 * Start the kvm: ```cd kvm && ./setup.sh```
