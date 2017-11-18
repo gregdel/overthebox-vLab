@@ -1,0 +1,5 @@
+[Match]
+Name=qemu0
+
+[Network]
+Bridge=qemubr0

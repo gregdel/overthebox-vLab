@@ -1,0 +1,16 @@
+[Match]
+Name=qemubr0
+
+[Network]
+Description=Qemu bridge DHCP
+DHCPServer=yes
+IPMasquerade=yes
+IPForward=ipv4
+
+[Address]
+Address=192.168.200.1/24
+
+[DHCPServer]
+DNS=8.8.8.8
+EmitDNS=yes
+DefaultLeaseTimeSec=3600
