@@ -119,6 +119,16 @@ modem_traffic_switch() {
 	esac
 }
 
+modem_qos() {
+	modem=$1
+	rate=$2
+	latency=$3
+	echo "Setting up $modem with a rate of $rate and a latency of $latency"
+	docker exec "$modem" tc qdisc replace dev eth0 root netem rate "$rate" delay "$latency"
+	docker exec "$modem" tc qdisc replace dev wan root netem rate "$rate"
+	echo "Done"
+}
+
 setup_wan_ip() {
 	local modem=$1
 	local wan_ip=$2
@@ -168,58 +178,48 @@ usage() {
 	echo -e "    --dnat|-r <modem> <local_ip> <authorized_ip>  Setup dnat"
 	echo -e "    --wan|-w <modem> <wan_ip>                     Add a public IP on the wan interface of a modem"
 	echo -e "    --traffic|-t <modem> on|off                   Enable or disable the traffic on a modem"
+	echo -e "    --netem|-n <modem> <rate> <latency>           Set the latency and rate of the modem"
+	exit 1
 }
 
 if [ "$(id -u)" -ne 0 ]; then
 	echo "This program must be run as root"
 	exit 1
 fi
+[ "$#" -lt 1 ] && usage
 
-if [ "$#" -lt 1 ]; then
-	usage
-	exit 1
-fi
-
-while [ "$1" != "" ]; do
+while [ -n "$1" ]; do
 	case $1 in
-		-m | --modem )          shift
+		-m | --modem )
 			build_image
 			start_network
 			start_container "$1"
-			;;
-		-d | --cleanup )        cleanup
-			exit
-			;;
-		-t | --traffic )        shift
-			modem="$1"
 			shift
-			modem_traffic_switch "$modem" "$1"
-			exit
 			;;
-		-r | --dnat )           shift
-			modem=$1
-			shift
-			local_ip=$1
-			shift
-			authorized_ip=$1
-			setup_dnat "$modem" "$local_ip" "$authorized_ip"
-			exit
+		-d | --cleanup )
+			cleanup
 			;;
-		-w | --wan )            shift
-			modem=$1
-			shift
-			wan_ip=$1
-			setup_wan_ip "$modem" "$wan_ip"
-			exit
+		-t | --traffic )
+			modem_traffic_switch "$2" "$3"
+			shift 2
 			;;
-		-c | --client )         start_temporary_client
-			exit
+		-r | --dnat )
+			setup_dnat "$2" "$3" "$4"
+			shift 3
 			;;
-		-h | --help )           usage
-			exit
+		-w | --wan )
+			setup_wan_ip "$2" "$3"
+			shift 2
 			;;
-		* )                     usage
-			exit 1
+		-c | --client )
+			start_temporary_client
+			;;
+		-n | --netem )
+			modem_qos "$2" "$3" "$4"
+			shift 3
+			;;
+		* )
+			usage
 	esac
 	shift
 done
