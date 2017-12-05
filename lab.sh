@@ -193,7 +193,7 @@ while [ -n "$1" ]; do
 		-m | --modem )
 			build_image
 			start_network
-			start_container "$1"
+			start_container "$2"
 			shift
 			;;
 		-d | --cleanup )
