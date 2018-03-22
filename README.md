@@ -6,15 +6,15 @@ This tool is made for development purposes only.
 ## Requirements
 
 * docker (1.12.0+)
-* kvm (qemu-kvm libvirt-bin on debian)
+* qemu
 
 ## Run
 
 ### General idea
 
 * Docker will create a bridge network
-* Docker will create FAI boxes and clients on the same switch (bridge)
-* kvm will provide full virtualisation of the overthebox, it will be linked to the same switch
+* Docker will create ISP routers and clients on the same switch (bridge)
+* qemu will provide full virtualisation of the overthebox and will added to the same switch
 
 ### Steps
 
@@ -45,10 +45,10 @@ sudo ./lab.sh --dnat modem1 _local_ip_ _remote_ip_
 
 ### Setup tc - rate / latency
 
-You can setup the latency and the rate of each modem using the ```setup_tc.sh``` script.
+You can setup the latency and the rate of each router.
 
 ```
-./setup_tc.sh modem2 1mbit 200ms
+sudo ./lab.sh --netem modem2 1mbit 200ms
 ```
 
 ## Register your device using the API
