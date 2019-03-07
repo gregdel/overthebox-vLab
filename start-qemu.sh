@@ -1,20 +1,20 @@
 #!/bin/sh
+set -e
+
+# lib
+. ./lib/lab.sh
+
+[ "$(id -u)" != 0 ] && _log_error "This program must be run as root"
 
 RELEASE="develop"
 IMG_URL="http://downloads.overthebox.net/$RELEASE/targets/x86/64/latest.img.gz"
 DISK_IMG="otb.img"
 IF_NAME="otb0"
-UP_SCRIPT=$(pwd)/qemu-ifup
-DOWN_SCRIPT=$(pwd)/qemu-ifdown
+UP_SCRIPT=$(pwd)/qemu.hooks.d/ifup
+DOWN_SCRIPT=$(pwd)/qemu.hooks.d/ifdown
 DEFAULT_IMG_NAME="latest.img.gz"
 DISK_IMG="otb.img"
 DOCKER_NETWORK="true"
-
-# Enforce root user
-if [ "$(id -u)" -ne 0 ]; then
-	echo "This program must be run as root"
-	exit 1
-fi
 
 usage() {
 	echo "Usage:"

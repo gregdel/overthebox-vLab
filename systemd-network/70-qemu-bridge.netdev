@@ -1,4 +1,0 @@
-[NetDev]
-Description=qemu bridge
-Name=qemubr0
-Kind=bridge
