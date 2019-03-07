@@ -1,0 +1,35 @@
+#!/bin/sh
+set -e
+
+# TODO fix this non working shit
+
+# shellcheck source=../lib/lab.sh
+. lib/lab.sh
+
+modem=$1
+wan_ip=$2
+docker_pid=$3
+subnet=$4
+
+# Get the host gw
+host_gw=$(ip --oneline route get 8.8.8.8 | awk '{ print $3 }')
+main_interface=$(ip --oneline route get 8.8.8.8 | awk '{ print $5 }')
+
+_log_info "Creating the interface to add in the docker"
+ip link add link "$main_interface" name wan type macvlan
+_log_info "Interface added"
+
+_log_info "Addind the interface in the container"
+ip link set dev wan netns "$docker_pid"
+_log_info "Interface added to the container namespace"
+
+_log_info "Configuring IP"
+docker exec "$modem" ip link set wan up
+docker exec "$modem" ip addr add "$wan_ip"/32 dev wan
+docker exec "$modem" ip route add "$host_gw" dev wan
+docker exec "$modem" ip route change default via "$host_gw"
+_log_info "IP configured"
+
+_log_info "Configuring iptables"
+docker exec "$modem" iptables -t nat -A POSTROUTING -s "$subnet" -o wan -j MASQUERADE
+_log_info "iptables configured"

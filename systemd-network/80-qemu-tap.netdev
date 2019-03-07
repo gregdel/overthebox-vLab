@@ -1,4 +1,0 @@
-[NetDev]
-Description=qemu tap device
-Name=qemu0
-Kind=tap

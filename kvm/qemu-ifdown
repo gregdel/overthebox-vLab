@@ -1,8 +1,0 @@
-#! /bin/sh
-
-if [ -z "$1" ]; then
-    echo "Error: no interface specified"
-    exit 1
-fi
-
-ip link del "$1"
