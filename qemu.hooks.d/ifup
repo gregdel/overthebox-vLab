@@ -3,4 +3,11 @@ set -e
 
 [ "$1" ] || exit 1
 
-ip link set "$1" master "vlab" up
+# shellcheck source=../lib/lab.sh
+. ./lib/lab.sh
+
+case "$1" in
+	vlab_lan) _lan_up "$1" ;;
+	*_lan) _modem_lan_up "$1" ;;
+	*) _log_error "Invalid interface name: $1" ;;
+esac

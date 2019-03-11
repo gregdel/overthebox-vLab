@@ -1,0 +1,53 @@
+#!/bin/sh
+set -e
+
+# lib
+. ./lib/lab.sh
+
+[ "$(id -u)" != 0 ] && _log_error "This program must be run as root"
+
+_usage() {
+	prog=$(basename "$0")
+	echo "Usage:"
+	echo "    $prog [ p | profile ] [ l | list ]"
+	echo "    $prog [ p | profile ] [ sh | show ] PROFILE_NAME"
+	echo "    $prog [ p | profile ] up PROFILE_NAME"
+	echo "    $prog [ p | profile ] down"
+	echo "    $prog [ i | images ] list"
+	echo "    $prog [ i | images ] download [ RELEASE_NAME | URL ]"
+	echo "    $prog [ i | images ] delete IMAGE_NAME"
+	echo "    $prog [ i | images ] use IMAGE_NAME"
+	echo "    $prog [ e | enter ] MODEM_NAME"
+	echo "    $prog [ q | qemu ]"
+	exit 1
+}
+
+_handle_profile() {
+	shift
+	case "$1" in
+		l|list)  _profile_list      ;;
+		sh|show) _profile_show "$@" ;;
+		up)      _profile_up "$@"   ;;
+		down)    _profile_down      ;;
+		*)       _usage             ;;
+	esac
+}
+
+_handle_images() {
+	shift
+	case "$1" in
+		l|list)      _images_list          ;;
+		d|download)  _images_download "$@" ;;
+		delete)      _images_delete "$@"   ;;
+		u|use)       _images_use "$@"      ;;
+		*)           _usage                ;;
+	esac
+}
+
+case $1 in
+	p|profile) _handle_profile "$@" ;;
+	e|enter)   _modem_enter "$@"    ;;
+	i|images)  _handle_images "$@"  ;;
+	q|qemu)    _qemu_start          ;;
+	*)         _usage               ;;
+esac
