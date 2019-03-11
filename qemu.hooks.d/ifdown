@@ -3,4 +3,9 @@ set -e
 
 [ "$1" ] || exit 1
 
-ip link del "$1"
+# shellcheck source=../lib/lab.sh
+. ./lib/lab.sh
+
+case "$1" in
+	vlab_lan) _lan_down "$1" ;;
+esac
