@@ -29,6 +29,27 @@ _setup_sysctl() {
 	sysctl -p "$sysctl_conf"
 }
 
+_dhcp_server_start() {
+	modem_name=$1
+	# shellcheck source=/dev/null
+	.  "$CURRENT_PROFILE/$modem_name"
+	modem_ip=${MODEM_PRIVATE_IP%%/*}
+
+	ip netns exec "$modem_name" \
+		dnsmasq \
+			--interface lan \
+			--server 1.1.1.1 \
+			--server 8.8.8.8 \
+			--port 0 \
+			--no-resolv \
+			--dhcp-range="$modem_ip,${modem_ip}00,12h"
+}
+
+_dhcp_server_stop() {
+	modem_name=$1
+	ip netns exec "$modem_name" lsof -i -n | grep dnsmasq | awk '{ print $2 }' | xargs kill
+}
+
 _modem_wan_up() {
 	modem_name=$1
 	# shellcheck source=/dev/null
@@ -67,6 +88,15 @@ _modem_lan_up() {
 
 	ip -n "$modem_name" addr add "$MODEM_PRIVATE_IP" dev lan
 	ip netns exec "$modem_name" iptables -t nat -A POSTROUTING -s "$MODEM_PRIVATE_IP" -o wan -j MASQUERADE
+
+	_dhcp_server_start "$modem_name"
+}
+
+_modem_lan_down() {
+	ifname=$1
+	modem_name=${ifname%%_lan}
+	ip -n "$modem_name" link del lan
+	_dhcp_server_stop "$modem_name"
 }
 
 _modem_down() {

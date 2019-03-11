@@ -8,4 +8,6 @@ set -e
 
 case "$1" in
 	vlab_lan) _lan_down "$1" ;;
+	*_lan) _modem_lan_down "$1" ;;
+	*) _log_error "Invalid interface name: $1" ;;
 esac
