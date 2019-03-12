@@ -236,6 +236,8 @@ _images_download() {
 			;;
 	esac
 
+	mkdir -p "$IMG_DIR" || true
+
 	_log_info "Downloading $url"
 	curl -Ss "$url" | gunzip -c > "$IMG_DIR/$filename"
 	_log_info "File $filename created"
