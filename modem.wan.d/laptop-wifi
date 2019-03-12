@@ -9,9 +9,9 @@ WIFI_INTERFACE=wlp58s0
 modem_name=$1
 wan_ip=$2
 
-host_gw=192.168.100.1
-_log_info "Host gateway: $host_gw"
-
+host_gw=$(ip -o route get 1.1.1.1 dev "$WIFI_INTERFACE" | awk '{ print $3 }')
+[ "$host_gw" ] || _log_error "Failed to find the host gateway"
+_log_info "Found the host gateway: $host_gw"
 
 _log_info "Creating ipvlan interface"
 ip link add "$modem_name" link "$WIFI_INTERFACE" type ipvlan mode l2

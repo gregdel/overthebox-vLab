@@ -250,7 +250,7 @@ _client_start() {
 	ip -n "$client_name" link set "$pseudo_random_name" name wan
 
 	_log_info "Getting a DHCP lease"
-	ip netns exec "$client_name" dhclient -v wan
+	ip netns exec "$client_name" dhclient -4 -v -cf /dev/null wan
 
 	_log_info "Starting a shell"
 	_namespace_enter "$client_name"
