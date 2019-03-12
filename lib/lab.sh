@@ -230,6 +230,7 @@ _images_use() {
 	[ -f "$file" ] || _log_error "Invalid image: $1"
 	[ -f "$QEMU_IMAGE" ] && rm "$QEMU_IMAGE"
 	ln -s "$file" "$QEMU_IMAGE"
+	_log_info "Using $file as the default qemu image"
 }
 
 ####################################################################
