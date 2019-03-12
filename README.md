@@ -20,8 +20,10 @@ in the `modem.wan.d` directory. If you use a custom wan script, set the
 ### Run
 
 ```sh
+# List all the available commands
+sudo ./vlab help
 # Setup the modems using the custom_lab profile
-sudo ./vlab profile up custom_lab
+sudo ./vlab profile use custom_lab
 # Download the latest develop image
 sudo ./vlab images download develop
 # Use this image for booting qemu
