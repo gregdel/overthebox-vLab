@@ -16,7 +16,8 @@ _usage() {
 	echo "    $prog [ i | images ] [ d | download ] [ RELEASE_NAME | URL ]"
 	echo "    $prog [ i | images ] delete IMAGE_NAME"
 	echo "    $prog [ i | images ] [ u | use ] IMAGE_NAME"
-	echo "    $prog [ e | enter ] MODEM_NAME"
+	echo "    $prog [ e | enter ] [ MODEM_NAME | CLIENT_NAME ]"
+	echo "    $prog [ c | client ] CLIENT_NAME"
 	echo "    $prog [ q | qemu ]"
 	exit 1
 }
@@ -43,9 +44,10 @@ _handle_images() {
 }
 
 case $1 in
-	p|profile) _handle_profile "$@" ;;
-	e|enter)   _modem_enter "$@"    ;;
-	i|images)  _handle_images "$@"  ;;
-	q|qemu)    _qemu_start          ;;
-	*)         _usage               ;;
+	p|profile) _handle_profile "$@"  ;;
+	e|enter)   _namespace_enter "$2" ;;
+	i|images)  _handle_images "$@"   ;;
+	q|qemu)    _qemu_start           ;;
+	c|client)  _client_start "$@"    ;;
+	*)         _usage                ;;
 esac

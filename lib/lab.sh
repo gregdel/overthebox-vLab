@@ -97,10 +97,10 @@ _modem_down() {
 	ip netns del "$modem_name"
 }
 
-_modem_enter() {
-	shift
-	modem_name=$1
-	PS1="[$modem_name] # " sudo ip netns exec "$modem_name" sh
+_namespace_enter() {
+	ns=$1
+	[ "$ns" ] || _log_error "Invalid namespace $ns"
+	PS1="[$ns] # " sudo ip netns exec "$ns" sh
 }
 
 _modem_show() {
@@ -231,6 +231,33 @@ _images_use() {
 	[ -f "$QEMU_IMAGE" ] && rm "$QEMU_IMAGE"
 	ln -s "$file" "$QEMU_IMAGE"
 	_log_info "Using $file as the default qemu image"
+}
+
+_client_start() {
+	shift
+	client_name="$1"
+	[ "$client_name" ] || _log_error "Missing client name"
+
+	_log_info "Creating client namespace"
+	ip netns add "$client_name"
+
+	_log_info "Creating client interfaces"
+	pseudo_random_name=$(date +%N)
+	ip link add "$client_name" type veth peer name "$pseudo_random_name"
+	ip link set "$client_name" up
+	ip link set "$pseudo_random_name" netns "$client_name"
+	ip link set "$client_name" master "$BRIDGE_NAME" up
+	ip -n "$client_name" link set "$pseudo_random_name" name wan
+
+	_log_info "Getting a DHCP lease"
+	ip netns exec "$client_name" dhclient -v wan
+
+	_log_info "Starting a shell"
+	_namespace_enter "$client_name"
+
+	_log_info "Removing client"
+	ip link del "$client_name"
+	ip netns del "$client_name"
 }
 
 ####################################################################
