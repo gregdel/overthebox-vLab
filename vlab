@@ -11,11 +11,11 @@ _usage() {
 	echo "Usage:"
 	echo "    $prog [ p | profile ] [ l | list ]"
 	echo "    $prog [ p | profile ] [ sh | show ] PROFILE_NAME"
-	echo "    $prog [ p | profile ] use PROFILE_NAME"
-	echo "    $prog [ i | images ] list"
-	echo "    $prog [ i | images ] download [ RELEASE_NAME | URL ]"
+	echo "    $prog [ p | profile ] [ u | use ] PROFILE_NAME"
+	echo "    $prog [ i | images ] [ l | list ]"
+	echo "    $prog [ i | images ] [ d | download ] [ RELEASE_NAME | URL ]"
 	echo "    $prog [ i | images ] delete IMAGE_NAME"
-	echo "    $prog [ i | images ] use IMAGE_NAME"
+	echo "    $prog [ i | images ] [ u | use ] IMAGE_NAME"
 	echo "    $prog [ e | enter ] MODEM_NAME"
 	echo "    $prog [ q | qemu ]"
 	exit 1
@@ -26,7 +26,7 @@ _handle_profile() {
 	case "$1" in
 		l|list)  _profile_list      ;;
 		sh|show) _profile_show "$@" ;;
-		use)     _profile_use "$@"   ;;
+		u|use)   _profile_use "$@"  ;;
 		*)       _usage             ;;
 	esac
 }
