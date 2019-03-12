@@ -50,7 +50,7 @@ _dhcp_server_stop() {
 	ip netns exec "$modem_name" lsof -i -n | grep dnsmasq | awk '{ print $2 }' | xargs kill
 }
 
-_modem_wan_up() {
+_modem_up() {
 	modem_name=$1
 	# shellcheck source=/dev/null
 	.  "$CURRENT_PROFILE/$modem_name"
@@ -68,21 +68,15 @@ _modem_wan_up() {
 	_log_info "Creating namespace for $modem_name"
 	ip netns add "$modem_name"
 
-	_log_info "Adding $MODEM_PUBLIC_IP in container $modem_name using the $script script"
-
 	# Configure the WAN
+	_log_info "Adding $MODEM_PUBLIC_IP in container $modem_name using the $script script"
 	"./modem.wan.d/$script" "$modem_name" "$MODEM_PUBLIC_IP"
-}
 
-_modem_lan_up() {
-	ifname=$1
-	modem_name=${ifname%%_lan}
-
-	# shellcheck source=/dev/null
-	.  "$CURRENT_PROFILE/$modem_name"
-
-	ip link set "$ifname" netns "$modem_name"
-	ip -n "$modem_name" link set "$1" name lan
+	# Configure the LAN
+	_log_info "Configuring the lan interface"
+	lan_ifname=${modem_name}_lan
+	ip link set "$lan_ifname" netns "$modem_name"
+	ip -n "$modem_name" link set "$lan_ifname" name lan
 	ip -n "$modem_name" link set lo up
 	ip -n "$modem_name" link set lan up
 
@@ -92,19 +86,14 @@ _modem_lan_up() {
 	_dhcp_server_start "$modem_name"
 }
 
-_modem_lan_down() {
-	ifname=$1
-	modem_name=${ifname%%_lan}
-	ip -n "$modem_name" link del lan
-	_dhcp_server_stop "$modem_name"
-}
-
 _modem_down() {
 	modem_name=$1
 	# shellcheck source=/dev/null
 	.  "$CURRENT_PROFILE/$modem_name"
 
 	_log_info "Deleting namespace for $modem_name"
+	ip -n "$modem_name" link del lan
+	_dhcp_server_stop "$modem_name"
 	ip netns del "$modem_name"
 }
 
@@ -156,28 +145,13 @@ _profile_show() {
 	done
 }
 
-_profile_up() {
+_profile_use() {
 	shift
-	[ "$1" ] || _log_error "Missing profile name"
+	profile=$1
+	[ "$profile" ] || _log_error "Missing profile name"
 
-	ln -sf "$PROFILE_DIR/$1" "$CURRENT_PROFILE" || true
-
-	for file in "$CURRENT_PROFILE"/*; do
-		name=$(basename "$file")
-		case "$name" in
-			modem*) _modem_wan_up "$name" ;;
-		esac
-	done
-}
-
-_profile_down() {
-	for file in "$CURRENT_PROFILE"/*; do
-		name=$(basename "$file")
-		case "$name" in
-			modem*) _modem_down "$name" ;;
-		esac
-	done
-	rm "$CURRENT_PROFILE"
+	ln -sf "$PROFILE_DIR/$profile" "$CURRENT_PROFILE" || true
+	_log_info "Using $profile as the current profile for qemu"
 }
 
 _qemu_default_net_params() {

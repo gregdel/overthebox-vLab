@@ -11,8 +11,7 @@ _usage() {
 	echo "Usage:"
 	echo "    $prog [ p | profile ] [ l | list ]"
 	echo "    $prog [ p | profile ] [ sh | show ] PROFILE_NAME"
-	echo "    $prog [ p | profile ] up PROFILE_NAME"
-	echo "    $prog [ p | profile ] down"
+	echo "    $prog [ p | profile ] use PROFILE_NAME"
 	echo "    $prog [ i | images ] list"
 	echo "    $prog [ i | images ] download [ RELEASE_NAME | URL ]"
 	echo "    $prog [ i | images ] delete IMAGE_NAME"
@@ -27,8 +26,7 @@ _handle_profile() {
 	case "$1" in
 		l|list)  _profile_list      ;;
 		sh|show) _profile_show "$@" ;;
-		up)      _profile_up "$@"   ;;
-		down)    _profile_down      ;;
+		use)     _profile_use "$@"   ;;
 		*)       _usage             ;;
 	esac
 }
