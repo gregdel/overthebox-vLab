@@ -182,7 +182,7 @@ _profile_down() {
 
 _qemu_default_net_params() {
 	ifname=$1
-	echo "-net nic -net tap,ifname=$ifname,script=$QEMU_UP_SCRIPT,downscript=$QEMU_DOWN_SCRIPT"
+	echo "-netdev tap,id=$ifname,ifname=$ifname,script=$QEMU_UP_SCRIPT,downscript=$QEMU_DOWN_SCRIPT -device e1000,netdev=$ifname"
 }
 
 _qemu_start() {
