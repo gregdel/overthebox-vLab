@@ -1,0 +1,26 @@
+#!/bin/sh
+set -e
+
+# shellcheck source=../lib/lab.sh
+. lib/lab.sh
+
+WIFI_INTERFACE=wlp58s0
+
+modem_name=$1
+wan_ip=$2
+
+host_gw=192.168.100.1
+_log_info "Host gateway: $host_gw"
+
+
+_log_info "Creating ipvlan interface"
+ip link add "$modem_name" link "$WIFI_INTERFACE" type ipvlan mode l2
+ip link set "$modem_name" up
+ip link set "$modem_name" netns "$modem_name"
+
+_log_info "Configuring the network in the network namespace"
+ip -n "$modem_name" link set "$modem_name" name wan
+ip -n "$modem_name" link set lo up
+ip -n "$modem_name" link set wan up
+ip -n "$modem_name" addr add "$wan_ip" dev wan
+ip -n "$modem_name" route add default via "$host_gw" dev wan
