@@ -125,8 +125,15 @@ _lan_down() {
 
 _profile_list() {
 	echo "Profiles:"
+
+	selected_name=$(basename "$(readlink "$PROFILE_DIR/current")")
+
 	for profile in "$PROFILE_DIR"/*; do
-		echo "* $(basename "$profile")"
+		name=$(basename "$profile")
+		sign=" *"
+		[ "$name" == "current" ] && continue
+		[ "$name" == "$selected_name" ] && sign="->"
+		echo "$sign $name"
 	done
 }
 
@@ -187,10 +194,16 @@ _qemu_start() {
 
 _images_list() {
 	echo "Images: "
+
+	selected_name=$(basename "$(readlink "$IMG_DIR/otb.img")")
+
 	for file in "$IMG_DIR"/*.img; do
 		[ -f "$file" ] || break
 		name=$(basename "$file")
-		echo "* $name"
+		sign=" *"
+		[ "$name" == "otb.img" ] && continue
+		[ "$name" == "$selected_name" ] && sign="->"
+		echo "$sign $name"
 	done
 }
 
