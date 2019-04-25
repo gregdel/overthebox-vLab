@@ -116,6 +116,7 @@ _lan_up() {
 	ip link add name "$BRIDGE_NAME" type bridge
 	ip link set "$BRIDGE_NAME" up
 	ip link set "$1" master "$BRIDGE_NAME" up
+	ip addr add 192.168.100.10/24 dev "$BRIDGE_NAME"
 }
 
 _lan_down() {
