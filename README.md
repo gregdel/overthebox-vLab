@@ -7,6 +7,7 @@ This tool is made for development purposes only. It is only tested on archlinux.
 * qemu
 * dnsmasq
 * dhclient
+* lsof
 
 ## Profiles
 
