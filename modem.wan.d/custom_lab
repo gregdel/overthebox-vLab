@@ -4,6 +4,8 @@ set -e
 # shellcheck source=../lib/lab.sh
 . lib/lab.sh
 
+DEFAULT_MTU=1476
+
 modem_name=$1
 wan_ip=$2
 
@@ -15,15 +17,21 @@ _log_info "Creating veth interface"
 pseudo_random_name=$(date +%N)
 ip link add "$modem_name" type veth peer name "$pseudo_random_name"
 ip link set "$modem_name" up
+ip link set mtu "$DEFAULT_MTU" dev "$modem_name"
 ip link set "$pseudo_random_name" netns "$modem_name"
 
 _log_info "Configuring the network in the network namespace"
 ip -n "$modem_name" link set "$pseudo_random_name" name wan
 ip -n "$modem_name" link set lo up
 ip -n "$modem_name" link set wan up
+ip -n "$modem_name" link set mtu "$DEFAULT_MTU" dev wan
 ip -n "$modem_name" addr add "$wan_ip" dev wan
 ip -n "$modem_name" route add "$host_gw" dev wan scope link
-ip -n "$modem_name" route add default via "$host_gw"
+ip -n "$modem_name" route add default via "$host_gw" advmss "$(( DEFAULT_MTU - 40 ))"
+ip netns exec "$modem_name" \
+	iptables -t mangle -A POSTROUTING \
+		-p tcp --tcp-flags SYN,RST SYN \
+		-o wan -j TCPMSS --clamp-mss-to-pmtu
 
 _log_info "Adding route on the host"
 ip route add "$wan_ip" dev "$modem_name" scope link table 100
